@@ -3,9 +3,11 @@ import store from "./store";
 import {
   getChangeInputValueAction,
   getAddListItemAction,
-  getDelItemAction
+  getDelItemAction,
+  initListAction
 } from "./store/actionCreator";
 import TodoListUI from "./TodoListUI";
+import axios from "axios";
 
 class TodoList extends Component {
   constructor(props) {
@@ -31,6 +33,14 @@ class TodoList extends Component {
       />
     );
   }
+  componentDidMount() {
+    axios.get("/list").then(res => {
+      const data = res.data;
+      const action = initListAction(data);
+      store.dispatch(action);
+    });
+  }
+
   changeStore() {
     this.setState(store.getState());
   }
