@@ -4,7 +4,7 @@ import {
   getChangeInputValueAction,
   getAddListItemAction,
   getDelItemAction,
-  getInitList
+  getTodoList
 } from "./store/actionCreator";
 import TodoListUI from "./TodoListUI";
 
@@ -33,7 +33,7 @@ class TodoList extends Component {
     );
   }
   componentDidMount() {
-    const action = getInitList();
+    const action = getTodoList();
     store.dispatch(action);
   }
 
