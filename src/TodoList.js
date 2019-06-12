@@ -1,59 +1,75 @@
 import React, { Component } from "react";
-import store from "./store";
+import { connect } from "react-redux";
 import {
   getChangeInputValueAction,
   getAddListItemAction,
   getDelItemAction,
   getInitList
 } from "./store/actionCreator";
-import TodoListUI from "./TodoListUI";
+import axios from "axios";
 
 class TodoList extends Component {
-  constructor(props) {
-    super(props);
-    this.state = store.getState();
-
-    this.addList = this.addList.bind(this);
-    this.changeStore = this.changeStore.bind(this);
-    this.changeValue = this.changeValue.bind(this);
-
-    // store变更的时候会自动执行该方法
-    store.subscribe(this.changeStore);
-  }
-
-  render() {
-    return (
-      <TodoListUI
-        inputValue={this.state.inputValue}
-        list={this.state.list}
-        changeValue={this.changeValue}
-        addList={this.addList}
-        delItem={this.delItem}
-      />
-    );
-  }
   componentDidMount() {
-    const action = getInitList();
-    store.dispatch(action);
+    this.props.getInitList();
   }
+  render() {
+    const { inputValue, list, changeValue, addList, delItem } = this.props;
+    return (
+      <div>
+        <input type="text" value={inputValue} onChange={changeValue} />
+        <button onClick={addList}>提交</button>
 
-  changeStore() {
-    this.setState(store.getState());
-  }
-  changeValue(e) {
-    const action = getChangeInputValueAction(e.target.value);
-    store.dispatch(action);
-  }
-
-  addList() {
-    const action = getAddListItemAction();
-    store.dispatch(action);
-  }
-
-  delItem(index) {
-    const action = getDelItemAction(index);
-    store.dispatch(action);
+        {list.length > 0 ? (
+          <ul>
+            {list.map((item, index) => {
+              return (
+                <li key={index} onClick={() => delItem(index)}>
+                  {item}
+                </li>
+              );
+            })}
+          </ul>
+        ) : (
+          <ul>
+            <li>暂无数据</li>
+          </ul>
+        )}
+      </div>
+    );
   }
 }
 
-export default TodoList;
+const mapStateToProps = state => {
+  return {
+    inputValue: state.inputValue,
+    list: state.list
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    changeValue(e) {
+      const action = getChangeInputValueAction(e.target.value);
+      dispatch(action);
+    },
+    addList() {
+      const action = getAddListItemAction();
+      dispatch(action);
+    },
+    delItem(index) {
+      const action = getDelItemAction(index);
+      dispatch(action);
+    },
+    getInitList() {
+      axios.get("/list").then(res => {
+        const action = getInitList(res.data);
+        dispatch(action);
+      });
+    }
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(TodoList);

@@ -2,7 +2,7 @@ import {
   CHANGE_INPUT_VALUE,
   ADD_LIST_ITEM,
   DELETE_ITEM,
-  INIT_LIST_ACTION
+  GET_INIT_LIST
 } from "./actionTypes";
 
 const defaultState = {
@@ -27,7 +27,7 @@ export default (state = defaultState, action) => {
     newState.list.splice(action.index, 1);
     return newState;
   }
-  if (action.type === INIT_LIST_ACTION) {
+  if (action.type === GET_INIT_LIST) {
     let newState = JSON.parse(JSON.stringify(state));
     newState.list = action.data;
     return newState;
